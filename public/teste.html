@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste API - Desafios Fitness</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            padding: 30px;
+        }
+
+        h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .section h2 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: 600;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: #5568d3;
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .response {
+            margin-top: 15px;
+            padding: 15px;
+            background: white;
+            border-radius: 5px;
+            border-left: 4px solid #667eea;
+            white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .success {
+            border-left-color: #28a745;
+            background: #d4edda;
+        }
+
+        .error {
+            border-left-color: #dc3545;
+            background: #f8d7da;
+        }
+
+        .token-display {
+            background: #fff3cd;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            word-break: break-all;
+            font-family: monospace;
+            font-size: 12px;
+        }
+
+        .endpoint-list {
+            list-style: none;
+        }
+
+        .endpoint-list li {
+            padding: 10px;
+            background: white;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .method {
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .method.post {
+            background: #28a745;
+            color: white;
+        }
+
+        .method.get {
+            background: #007bff;
+            color: white;
+        }
+
+        .method.put {
+            background: #ffc107;
+            color: black;
+        }
+
+        .method.delete {
+            background: #dc3545;
+            color: white;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .status.ok {
+            background: #28a745;
+            color: white;
+        }
+
+        .status.error {
+            background: #dc3545;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>API Desafios Fitness - Teste</h1>
+        <p class="subtitle">Servidor rodando em: <strong>http://localhost:8000</strong></p>
+
+        <!-- Seção Login -->
+        <div class="section">
+            <h2>1. Login (Autenticação)</h2>
+            <div class="form-group">
+                <label>Email:</label>
+                <input type="email" id="email" value="admin@appfit.com">
+            </div>
+            <div class="form-group">
+                <label>Senha:</label>
+                <input type="password" id="senha" value="123456">
+            </div>
+            <button onclick="fazerLogin()">Fazer Login</button>
+            <div id="loginResponse"></div>
+            <div id="tokenDisplay"></div>
+        </div>
+
+        <!-- Seção Listar Desafios -->
+        <div class="section">
+            <h2>2. Listar Todos os Desafios</h2>
+            <p style="color: #666; margin-bottom: 10px;">
+                <span class="status" id="tokenStatus">Faça login primeiro</span>
+            </p>
+            <button onclick="listarDesafios()" id="btnListar" disabled>Listar Desafios</button>
+            <div id="desafiosResponse"></div>
+        </div>
+
+        <!-- Seção Buscar por ID -->
+        <div class="section">
+            <h2>3. Buscar Desafio por ID</h2>
+            <div class="form-group">
+                <label>ID do Desafio:</label>
+                <input type="number" id="desafioId" value="1" min="1">
+            </div>
+            <button onclick="buscarDesafio()" id="btnBuscar" disabled>Buscar Desafio</button>
+            <div id="buscarResponse"></div>
+        </div>
+
+        <!-- Seção Criar Desafio -->
+        <div class="section">
+            <h2>4. Criar Novo Desafio</h2>
+            <div class="form-group">
+                <label>Título:</label>
+                <input type="text" id="criarTitulo" placeholder="Ex: Desafio de Natação">
+            </div>
+            <div class="form-group">
+                <label>Descrição:</label>
+                <input type="text" id="criarDescricao" placeholder="Ex: Nadar 1km por dia durante 20 dias">
+            </div>
+            <div class="form-group">
+                <label>Data de Início:</label>
+                <input type="date" id="criarDataInicio">
+            </div>
+            <div class="form-group">
+                <label>Data de Fim:</label>
+                <input type="date" id="criarDataFim">
+            </div>
+            <div class="form-group">
+                <label>Nível de Dificuldade:</label>
+                <select id="criarNivel" style="width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 5px; font-size: 14px;">
+                    <option value="Iniciante">Iniciante</option>
+                    <option value="Intermediario" selected>Intermediário</option>
+                    <option value="Avancado">Avançado</option>
+                    <option value="Extremo">Extremo</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Recompensa:</label>
+                <input type="text" id="criarRecompensa" placeholder="Ex: Badge Aquático + 150 pontos">
+            </div>
+            <button onclick="criarDesafio()" id="btnCriar" disabled>Criar Desafio</button>
+            <div id="criarResponse"></div>
+        </div>
+
+        <!-- Endpoints Disponíveis -->
+        <div class="section">
+            <h2>Endpoints Disponíveis</h2>
+            <ul class="endpoint-list">
+                <li>
+                    <span><span class="method post">POST</span> /login</span>
+                    <span>Autenticação</span>
+                </li>
+                <li>
+                    <span><span class="method get">GET</span> /desafios</span>
+                    <span>Listar todos</span>
+                </li>
+                <li>
+                    <span><span class="method get">GET</span> /desafios/{id}</span>
+                    <span>Buscar por ID</span>
+                </li>
+                <li>
+                    <span><span class="method post">POST</span> /desafios</span>
+                    <span>Criar desafio</span>
+                </li>
+                <li>
+                    <span><span class="method put">PUT</span> /desafios/{id}</span>
+                    <span>Atualizar desafio</span>
+                </li>
+                <li>
+                    <span><span class="method delete">DELETE</span> /desafios/{id}</span>
+                    <span>Excluir desafio</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        let token = null;
+        const API_URL = 'http://localhost:8000';
+
+        // Função de Login
+        async function fazerLogin() {
+            const email = document.getElementById('email').value;
+            const senha = document.getElementById('senha').value;
+
+            try {
+                const response = await fetch(`${API_URL}/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, senha })
+                });
+
+                const data = await response.json();
+
+                const responseDiv = document.getElementById('loginResponse');
+                responseDiv.className = 'response ' + (data.status === 'sucesso' || !data.erro ? 'success' : 'error');
+                responseDiv.textContent = JSON.stringify(data, null, 2);
+
+                if (data.status === 'sucesso') {
+                    token = data.dados.token;
+                    document.getElementById('tokenDisplay').innerHTML = `
+                        <div class="token-display">
+                            <strong>Token JWT gerado:</strong><br>
+                            ${token.substring(0, 50)}...
+                        </div>
+                    `;
+
+                    // Habilitar outros botões
+                    document.getElementById('btnListar').disabled = false;
+                    document.getElementById('btnBuscar').disabled = false;
+                    document.getElementById('btnCriar').disabled = false;
+
+                    const statusEl = document.getElementById('tokenStatus');
+                    statusEl.className = 'status ok';
+                    statusEl.textContent = 'Token disponível';
+
+                    // Definir datas padrão
+                    const hoje = new Date().toISOString().split('T')[0];
+                    const futuro = new Date();
+                    futuro.setDate(futuro.getDate() + 30);
+                    document.getElementById('criarDataInicio').value = hoje;
+                    document.getElementById('criarDataFim').value = futuro.toISOString().split('T')[0];
+                }
+            } catch (error) {
+                const responseDiv = document.getElementById('loginResponse');
+                responseDiv.className = 'response error';
+                responseDiv.textContent = 'Erro: ' + error.message;
+            }
+        }
+
+        // Função Listar Desafios
+        async function listarDesafios() {
+            if (!token) {
+                alert('Faça login primeiro!');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}/desafios`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const data = await response.json();
+
+                const responseDiv = document.getElementById('desafiosResponse');
+                responseDiv.className = 'response ' + (data.status === 'sucesso' || !data.erro ? 'success' : 'error');
+                responseDiv.textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                const responseDiv = document.getElementById('desafiosResponse');
+                responseDiv.className = 'response error';
+                responseDiv.textContent = 'Erro: ' + error.message;
+            }
+        }
+
+        // Função Buscar Desafio
+        async function buscarDesafio() {
+            if (!token) {
+                alert('Faça login primeiro!');
+                return;
+            }
+
+            const id = document.getElementById('desafioId').value;
+
+            try {
+                const response = await fetch(`${API_URL}/desafios/${id}`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const data = await response.json();
+
+                const responseDiv = document.getElementById('buscarResponse');
+                responseDiv.className = 'response ' + (data.status === 'sucesso' || !data.erro ? 'success' : 'error');
+                responseDiv.textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                const responseDiv = document.getElementById('buscarResponse');
+                responseDiv.className = 'response error';
+                responseDiv.textContent = 'Erro: ' + error.message;
+            }
+        }
+
+        // Função Criar Desafio
+        async function criarDesafio() {
+            if (!token) {
+                alert('Faça login primeiro!');
+                return;
+            }
+
+            const titulo = document.getElementById('criarTitulo').value;
+            const descricao = document.getElementById('criarDescricao').value;
+            const dataInicio = document.getElementById('criarDataInicio').value;
+            const dataFim = document.getElementById('criarDataFim').value;
+            const nivel = document.getElementById('criarNivel').value;
+            const recompensa = document.getElementById('criarRecompensa').value;
+
+            if (!titulo || !descricao || !dataInicio || !dataFim) {
+                alert('Preencha todos os campos obrigatórios!');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}/desafios`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        titulo: titulo,
+                        descricao: descricao,
+                        data_inicio: dataInicio,
+                        data_fim: dataFim,
+                        nivel_dificuldade: nivel,
+                        recompensa: recompensa
+                    })
+                });
+
+                const data = await response.json();
+
+                const responseDiv = document.getElementById('criarResponse');
+                responseDiv.className = 'response ' + (data.status === 'sucesso' || !data.erro ? 'success' : 'error');
+                responseDiv.textContent = JSON.stringify(data, null, 2);
+
+                // Limpar formulário se sucesso
+                if (data.status === 'sucesso') {
+                    document.getElementById('criarTitulo').value = '';
+                    document.getElementById('criarDescricao').value = '';
+                    document.getElementById('criarRecompensa').value = '';
+                }
+            } catch (error) {
+                const responseDiv = document.getElementById('criarResponse');
+                responseDiv.className = 'response error';
+                responseDiv.textContent = 'Erro: ' + error.message;
+            }
+        }
+    </script>
+</body>
+</html>

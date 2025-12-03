@@ -1,0 +1,20 @@
+# Dependências do Composer
+/vendor/
+composer.lock
+
+# Arquivo de configuração local
+.env
+
+# Logs
+*.log
+
+# Sistema operacional
+.DS_Store
+Thumbs.db
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
