@@ -231,19 +231,19 @@ Todos os métodos DAO e Service possuem try/catch para tratamento de exceções.
 
 ## Requisitos Atendidos
 
-✅ Padrão MVC com separação em camadas
+Padrão MVC com separação em camadas
 
-✅ CRUD completo para entidade Desafios
+CRUD completo para entidade Desafios
 
-✅ Autenticação JWT em rotas protegidas
+Autenticação JWT em rotas protegidas
 
-✅ Tratamento de erros com try/catch
+Tratamento de erros com try/catch
 
-✅ Validações de dados no Service
+Validações de dados no Service
 
-✅ Mensagens de erro padronizadas
+Mensagens de erro padronizadas
 
-✅ Banco de dados MySQL com 3 tabelas relacionadas
+Banco de dados MySQL com 3 tabelas relacionadas
 
 ---
 
