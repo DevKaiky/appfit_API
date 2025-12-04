@@ -33,29 +33,54 @@ class AuthService
     public function login(string $email, string $senha): array
     {
         try {
+            error_log("=== INÍCIO DO LOGIN ===");
+            error_log("Email recebido: {$email}");
+            error_log("Senha recebida (length): " . strlen($senha));
+
             // Validar dados de entrada
             if (empty($email) || empty($senha)) {
+                error_log("ERRO: E-mail ou senha vazios");
                 throw new Exception("E-mail e senha são obrigatórios");
             }
 
             if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                error_log("ERRO: E-mail com formato inválido: {$email}");
                 throw new Exception("E-mail inválido");
             }
 
             // Buscar usuário no banco
+            error_log("Buscando usuário no banco de dados...");
             $usuario = $this->usuarioDAO->buscarPorEmail($email);
 
             if (!$usuario) {
+                error_log("ERRO: Usuário não encontrado para o email: {$email}");
                 throw new Exception("E-mail ou senha inválidos");
             }
 
+            error_log("Usuário encontrado - ID: {$usuario['id']}, Nome: {$usuario['nome']}, Ativo: {$usuario['ativo']}");
+            error_log("Hash no banco (30 primeiros chars): " . substr($usuario['senha'], 0, 30) . "...");
+
             // Verificar senha
-            if (!password_verify($senha, $usuario['senha'])) {
+            error_log("Verificando senha com password_verify...");
+            $senhaCorreta = password_verify($senha, $usuario['senha']);
+            error_log("Resultado password_verify: " . ($senhaCorreta ? 'TRUE (senha correta)' : 'FALSE (senha incorreta)'));
+
+            if (!$senhaCorreta) {
+                error_log("ERRO: Senha incorreta para o email: {$email}");
+
+                // Log adicional para debug
+                $novoHash = password_hash($senha, PASSWORD_DEFAULT);
+                error_log("Hash que seria gerado com a senha fornecida: {$novoHash}");
+                error_log("Hash atual no banco: {$usuario['senha']}");
+
                 throw new Exception("E-mail ou senha inválidos");
             }
 
             // Gerar token JWT
+            error_log("Gerando token JWT...");
             $token = $this->gerarToken($usuario);
+            error_log("Token gerado com sucesso");
+            error_log("=== LOGIN BEM-SUCEDIDO ===");
 
             return [
                 'usuario' => [
@@ -66,7 +91,8 @@ class AuthService
                 'token' => $token
             ];
         } catch (Exception $e) {
-            error_log("Erro no service de autenticação: " . $e->getMessage());
+            error_log("ERRO no service de autenticação: " . $e->getMessage());
+            error_log("Stack trace: " . $e->getTraceAsString());
             throw $e;
         }
     }

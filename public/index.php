@@ -1,5 +1,10 @@
 <?php
 
+// Desabilitar exibição de erros no output (apenas log)
+ini_set('display_errors', '0');
+ini_set('display_startup_errors', '0');
+error_reporting(E_ALL);
+
 require_once __DIR__ . '/../vendor/autoload.php';
 
 use App\Controller\DesafioController;
@@ -7,8 +12,21 @@ use App\Controller\AuthController;
 use App\Middleware\AuthMiddleware;
 
 // Carregar variáveis de ambiente
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/..');
-$dotenv->load();
+try {
+    $envPath = __DIR__ . '/..';
+
+    // Verificar se o arquivo .env existe
+    if (!file_exists($envPath . '/.env')) {
+        error_log("AVISO: Arquivo .env não encontrado em: " . $envPath);
+        error_log("Usando valores padrão de configuração. Copie .env.example para .env e configure.");
+    }
+
+    $dotenv = Dotenv\Dotenv::createImmutable($envPath);
+    $dotenv->safeLoad(); // Usa safeLoad ao invés de load para não dar erro se .env não existir
+} catch (Exception $e) {
+    error_log("Erro ao carregar .env: " . $e->getMessage());
+    // Continua a execução com valores padrão
+}
 
 // Configurar headers CORS
 header('Access-Control-Allow-Origin: *');
