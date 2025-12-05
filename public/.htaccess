@@ -1,5 +1,9 @@
 RewriteEngine On
 
+# Permitir arquivos HTML estáticos
+RewriteCond %{REQUEST_FILENAME} -f
+RewriteRule ^.*\.html$ - [L]
+
 # Redirecionar todo tráfego para index.php
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d

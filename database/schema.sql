@@ -65,8 +65,15 @@ CREATE TABLE IF NOT EXISTS progresso (
 -- Dados de exemplo para testes
 -- ===========================================
 
+-- IMPORTANTE: Após importar este arquivo, execute o script seed.php para gerar senhas corretas:
+-- php database/seed.php
+--
+-- Ou manualmente insira usuários com hash gerado no PHP atual:
+-- password_hash('123456', PASSWORD_DEFAULT)
+
 -- Inserir usuário de teste (senha: 123456)
--- Hash gerado com: password_hash('123456', PASSWORD_DEFAULT)
+-- ATENÇÃO: Este hash pode não funcionar em todas as versões do PHP
+-- Recomendado: Use o seed.php após importar
 INSERT INTO usuarios (nome, email, senha) VALUES
 ('Admin Teste', 'admin@appfit.com', '$2y$10$PPrUuBgZORh/RlYzTy5/R7KVU9nFvO2gN/dGnIHuN0LRbLqwkKeAW'),
 ('João Silva', 'joao@email.com', '$2y$10$PPrUuBgZORh/RlYzTy5/R7KVU9nFvO2gN/dGnIHuN0LRbLqwkKeAW'),

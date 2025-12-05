@@ -88,8 +88,9 @@ class AuthController
         header('Content-Type: application/json; charset=utf-8');
 
         echo json_encode([
-            'erro' => $mensagem,
-            'dado' => null
+            'status' => 'erro',
+            'mensagem' => $mensagem,
+            'dados' => null
         ], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
 
         exit;
