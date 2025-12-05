@@ -19,7 +19,13 @@ class AuthService
     public function __construct()
     {
         $this->usuarioDAO = new UsuarioDAO();
-        $this->chaveSecreta = $_ENV['JWT_SECRET'] ?? 'sua_chave_secreta_aqui_mude_em_producao';
+
+        // Verificar se JWT_SECRET está configurado
+        if (empty($_ENV['JWT_SECRET'])) {
+            throw new Exception("JWT_SECRET não configurado no arquivo .env");
+        }
+
+        $this->chaveSecreta = $_ENV['JWT_SECRET'];
     }
 
     /**
